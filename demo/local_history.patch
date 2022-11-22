@@ -1,0 +1,91 @@
+Index: src/main/java/com/example/demo/service/Impl/EmployeeService.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/com/example/demo/service/Impl/EmployeeService.java b/src/main/java/com/example/demo/service/Impl/EmployeeService.java
+--- a/src/main/java/com/example/demo/service/Impl/EmployeeService.java	
++++ b/src/main/java/com/example/demo/service/Impl/EmployeeService.java	(date 1668054840204)
+@@ -6,7 +6,6 @@
+ 
+ import com.example.demo.dto.RoleDTO;
+ import com.example.demo.entity.Employee;
+-import com.example.demo.exception.DuplicateEntityException;
+ import com.example.demo.mapper.MapStructMapper;
+ import com.example.demo.repository.EmployeeRepository;
+ import com.example.demo.service.IEmployeeService;
+@@ -14,11 +13,11 @@
+ import org.springframework.beans.factory.annotation.Autowired;
+ import org.springframework.data.domain.Page;
+ import org.springframework.data.domain.Pageable;
+-import org.springframework.http.HttpStatus;
+ import org.springframework.http.ResponseEntity;
+ import org.springframework.stereotype.Service;
+ 
+ import javax.persistence.EntityNotFoundException;
++import javax.validation.constraints.NotNull;
+ import java.util.ArrayList;
+ import java.util.List;
+ 
+@@ -42,15 +41,10 @@
+                 foundEmployee);
+     }
+ 
+-    public ResponseEntity<EmployeeDTO> deleteById(long id) {
+-        if (findById(id) != null) {
+-            employeeRepository.deleteById(id);
+-            EmployeeDTO employeeDTO = findById(id);
+-            return ResponseEntity.status(HttpStatus.OK).body(employeeDTO);
+-        } else {
+-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new EmployeeDTO());
+-        }
+-
++    @Override
++    public ResponseEntity<Void> deleteById(long id) {
++        employeeRepository.deleteById(id);
++        return ResponseEntity.noContent().build();
+     }
+ 
+     @Override
+@@ -76,13 +70,23 @@
+     public EmployeeDTO save(EmployeeDTO employeeDTO) {
+         Employee employee = new Employee();
+         if (employeeDTO.getId() == null) employeeDTO.setId(0L);
+-        BranchDTO branchDTO = branchService.findById(employeeDTO.getBranch().getId());
+-        RoleDTO roleDTO = roleService.findById(employeeDTO.getRole().getId());
+-        employeeDTO.setRole(roleDTO);
+-        employeeDTO.setBranch(branchDTO);
++        if (employeeDTO.getBranchDTO() != null) {
++            BranchDTO branchDTO = branchService
++                    .findById(employeeDTO
++                            .getBranchDTO()
++                            .getId());
++            employeeDTO.setBranchDTO(branchDTO);
++        }
++        if (employeeDTO.getRole() != null) {
++            RoleDTO roleDTO = roleService.findById(employeeDTO.getRole().getId());
++            employeeDTO.setRole(roleDTO);
++        }
++
+         employeeDTO.setActive(true);
++
+         employee = mapStructMapper.toEntity(employeeDTO);
+         System.out.println("==========================================");
++        System.out.println(employee.toString());
+         employee = employeeRepository.save(employee);
+         System.out.println("=========================================");
+         System.out.println(employee.toString());
+@@ -91,6 +95,13 @@
+ 
+     }
+ 
++    public EmployeeDTO updateEmployee(EmployeeDTO model, long id) {
++        Employee employeeUpdate = employeeRepository.findById(id)
++                .orElseThrow(() -> new EntityNotFoundException("Not existed id=" + id));
++        mapStructMapper.updateEmployeeFromDTO(model, employeeUpdate);
++        return mapStructMapper.toDTO(employeeUpdate);
++    }
++
+     public int totalEmployee() {
+         return (int) employeeRepository.count();
+     }
