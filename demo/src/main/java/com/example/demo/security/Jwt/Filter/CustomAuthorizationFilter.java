@@ -9,7 +9,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
@@ -47,40 +46,45 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
 //            SecurityContextHolder.getContext().setAuthentication(authentication);
 //        }
 //        logger.info("token:" + jwt);
-        try {
-            final String header = request.getHeader(HttpHeaders.AUTHORIZATION);
-            String token = null;
-            String username = null;
+        final String header = request.getHeader(HttpHeaders.AUTHORIZATION);
+        String token = null;
+        String username = null;
 
-            //check header != null
-            if (header != null && header.startsWith("Bearer ")) {
-                token = header.substring(7);
-                logger.info("Token from header: " + token);
-                username = jwtUtil.getUserNameFromJwtToken(token);
-                logger.info("username: " + username);
-            }
-
-            // if authentication == null
-            if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                UserDetailImpl userDetail = userDetailService.loadUserByUsername(username);
-                //if jwt is validate
-                if (jwtUtil.validateJwtToken(token)) {
-                    UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetail, null, userDetail.getAuthorities());
-                    logger.info(userDetail.getAuthorities().toString());
-                    authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                    SecurityContextHolder.getContext().setAuthentication(authentication);
-                    filterChain.doFilter(request, response);
-                }
-            }
-            filterChain.doFilter(request, response);
-        }catch(Exception ex){
-            log.error("Error logging in: {}", ex.getMessage());
-            response.setHeader("error", ex.getMessage());
-            response.sendError(HttpStatus.FORBIDDEN.value());
+        //check header != null
+        if (header != null && header.startsWith("Bearer ")) {
+            token = header.substring(7);
+            logger.info("Token from header: " + token);
+            username = jwtUtil.getUserNameFromJwtToken(token);
+            logger.info("username: " + username);
         }
+
+        // if authentication == null
+        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            UserDetailImpl userDetail = userDetailService.loadUserByUsername(username);
+            //if jwt is validate
+            if (jwtUtil.validateJwtToken(token)) {
+                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetail, null, userDetail.getAuthorities());
+                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            }
+        }
+        filterChain.doFilter(request, response);
+
+//        }catch(Exception ex){
+//            log.error("Error logging in: {}", ex.getMessage());
+//            response.setHeader("error", ex.getMessage());
+//            response.sendError(HttpStatus.FORBIDDEN.value());
+//            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+//            new ObjectMapper().writeValue(response.getOutputStream(), token);
     }
 
-//    private String parseJwt (HttpServletRequest request) {
-//        return jwtUtil.getJwtFromCookies(request);
-//    }
+
+//        Optional<String> token = Optional.ofNullable(request.getHeader("Authorization"))
+//                .filter(s -> s.length() > "BEARER".length() && s.startsWith("BEARER"))
+//                .map(s -> s.substring(7));
+//        Optional<Authentication> authentication = jwtUtil.validateJwtToken(token);
+
+
 }
+
+

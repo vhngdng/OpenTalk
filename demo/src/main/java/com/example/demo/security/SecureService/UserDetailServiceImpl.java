@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class UserDetailServiceImpl implements UserDetailsService {
 
     private final EmployeeRepository employeeRepository;
@@ -45,6 +46,6 @@ public class UserDetailServiceImpl implements UserDetailsService {
     }
 
     private Collection< ? extends GrantedAuthority> mapRolesToAuthorities(Set<Role> roles){
-        return roles.stream().map(role -> new SimpleGrantedAuthority(role.getName().name())).collect(Collectors.toList());
+        return roles.stream().map(role -> new SimpleGrantedAuthority(role.getName().toString())).collect(Collectors.toList());
     }
 }

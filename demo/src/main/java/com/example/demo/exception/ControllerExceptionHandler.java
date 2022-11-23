@@ -7,10 +7,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.context.request.WebRequest;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @RestControllerAdvice
 public class ControllerExceptionHandler {
@@ -60,5 +58,14 @@ public class ControllerExceptionHandler {
         String errorMessage = (throwable != null ? throwable.getMessage() : "Unknown error");
         model.addAttribute("errorMessage", errorMessage);
         return "error";
+    }
+
+    @ExceptionHandler( value = {AccessDeniedException.class})
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorMessage handleAccessDeniedException(AccessDeniedException exception){
+        return new ErrorMessage(
+                HttpStatus.BAD_REQUEST.value(),
+                LocalDateTime.now(),
+                exception.getMessage());
     }
 }

@@ -1,11 +1,14 @@
 package com.example.demo.security.config;
 
 import com.example.demo.security.Jwt.EntryPoint.AuthEntryPointJwt;
+import com.example.demo.security.Jwt.EntryPoint.CustomAuthenticationSuccessHandler;
 import com.example.demo.security.Jwt.Filter.CustomAuthorizationFilter;
-import com.example.demo.security.Jwt.Filter.CustomUsernamePasswordAuthenticationFilter;
 import com.example.demo.security.SecureService.UserDetailServiceImpl;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -21,24 +24,35 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 @RequiredArgsConstructor
 @EnableGlobalMethodSecurity(                         // enable @PreAuthorize and @PostAuthorize
-        prePostEnabled = true
+        prePostEnabled = true,
+        securedEnabled = true,
+        jsr250Enabled = true
 )
+@Slf4j
 //@Order(1)
 public class WebSecurityConfig {
 
     private final UserDetailServiceImpl userDetailServiceImpl;
 
     private final AuthEntryPointJwt authEntryPointJwt;
+    private final CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler;
+
+//    private final CustomUsernamePasswordAuthenticationFilter customUsernamePasswordAuthenticationFilter;
 
     @Bean
     public CustomAuthorizationFilter authorizationJwtTokenUtil() {
         return new CustomAuthorizationFilter();
     }
 
-    @Bean
-    public CustomUsernamePasswordAuthenticationFilter authenticationCustomJwtTokenUtil() {
-        return new CustomUsernamePasswordAuthenticationFilter();
-    }
+//    @Bean
+//    public CustomUsernamePasswordAuthenticationFilter authenticationCustomJwtTokenUtil() {
+//        return new CustomUsernamePasswordAuthenticationFilter();
+//    }
+
+//    @Bean
+//    public BCryptPasswordEncoder passwordEncoder() {
+//        return new BCryptPasswordEncoder();
+//    }
 
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
@@ -57,6 +71,9 @@ public class WebSecurityConfig {
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
+
+//    @Bean
+//    public UsernamePasswordAuthenticationFilter succesfull
 //    @Bean
 //    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 //        http.authorizeHttpRequests(requests -> {
@@ -122,59 +139,52 @@ public class WebSecurityConfig {
     }
 
 
-
-//    @Bean
-//    public AuthenticationManager authManager(HttpSecurity http) throws Exception {
-//        return http.getSharedObject(AuthenticationManagerBuilder.class)
-//                .userDetailsService(customUserDetailService)
-//                .and()
-//                .build();
-//    }
-
     @Bean
+    @Order(Ordered.HIGHEST_PRECEDENCE)
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf()
                 .disable()
                 .exceptionHandling()
                 .authenticationEntryPoint(authEntryPointJwt).and()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-                // 4type off session: "always", "ifRequired", "never", "stateless"
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()  // 4type off session: "always", "ifRequired", "never", "stateless"
                 .authorizeHttpRequests(requests -> {
                     try {
-                        requests.antMatchers("/login")
+                        requests
+                                .antMatchers("/login")
                                 .permitAll()
                                 .antMatchers("/oauth/token").permitAll()
-                                .antMatchers("api/v1/employee/**")
-                                .hasRole("ROLE_EMPLOYEE")
-                                .antMatchers("api/v1/admin/**")
-                                .hasAnyRole("ROLE_ADMIN", "ROLE_EMPLOYEE")
+                                .antMatchers("/employee/**")
+                                .hasAnyRole("ADMIN", "EMPLOYEE")
+                                .antMatchers("/admin/**")
+                                .hasRole("ADMIN")
                                 .anyRequest()
                                 .authenticated()
-                                .and().rememberMe().userDetailsService(userDetailServiceImpl)
-//                                .and()
-//                                .logout()
-//                                .logoutUrl("/logout")
-//                                .deleteCookies(Constance.cookiename)
-//                                .logoutSuccessHandler(logoutSuccessHandler())
-                        ;
+                                .and().rememberMe().userDetailsService(userDetailServiceImpl) ;
                     } catch (Exception e) {
                         throw new RuntimeException(e);
                     }
                 });
-
+//                .formLogin(withDefaults());
+//                .loginPage("/login")
+//                .defaultSuccessUrl("/login", true)
+//                .usernameParameter("email")
+//                .successHandler(customAuthenticationSuccessHandler);
         http.addFilterBefore(authorizationJwtTokenUtil(), UsernamePasswordAuthenticationFilter.class);
-//        http.addFilterBefore(authenticationCustomJwtTokenUtil(), CustomUsernamePasswordAuthenticationFilter.class);
-//        http.addFilter(getCustomFilter() -> )
-//        http.addFilter(new FilterCustomAuthentication());
+//        http.addFilter((Filter) customUsernamePasswordAuthenticationFilter);
+//        http.addFilter(customUsernamePasswordAuthenticationFilter);
+//        http.addFilter(CustomUsernamePasswordAuthenticationFilter());
         http.authenticationProvider(authenticationProvider());
         return http.build();
+
+
+
     }
 
-//    private Filter getCustomFilter() {
-//    }
-
-//    private LogoutSuccessHandler logoutSuccessHandler() {
-//    }
 
 
-}
+
+    }
+
+
+
+

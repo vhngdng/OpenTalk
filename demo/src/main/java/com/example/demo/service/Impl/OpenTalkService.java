@@ -12,20 +12,20 @@ import com.example.demo.repository.OpenTalkRepository;
 import com.example.demo.service.IOpenTalkService;
 import com.github.javafaker.Faker;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.data.domain.*;
+import org.springframework.security.access.prepost.PostFilter;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
-import java.util.*;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 @Transactional(rollbackOn = {Exception.class, Throwable.class})
+@Slf4j
 public class OpenTalkService implements IOpenTalkService {
     @Autowired
     private OpenTalkRepository openTalkRepository;
@@ -77,27 +77,39 @@ public class OpenTalkService implements IOpenTalkService {
     }
 
     @Override
-    public ResponseEntity<Void> deleteById(Long id) {
+    public void deleteById(Long id) {
         openTalkRepository.deleteById(id);
-        return ResponseEntity.noContent().build();
     }
 
     @Override
-    public ResponseEntity<List<OpenTalkDisplayDTO>> findAllOpenTalksOfEmployee(Long id) {
-        List<OpenTalkDisplayDTO> openTalkDisplayDTOS = mapStructMapper.toDisplayDTO(
+    @PostFilter("hasRole('ADMIN') or filterObject.name == authentication.name")
+    public List<OpenTalkDisplayDTO> findAllOpenTalksOfEmployee(Long id) {
+        return mapStructMapper.toDisplayDTO(
                 openTalkRepository
                         .findOpenTalksByEmployeeId(id)
                         .orElseThrow(() -> new EntityNotFoundException("Employee id is not existed " + id)));
-        return ResponseEntity.status(HttpStatus.OK).body(openTalkDisplayDTOS);
     }
 
     @Override
-    public ResponseEntity<List<OpenTalkDTO>> findDetailedOpenTalksOfEmployee(Long id) {
-        List<OpenTalkDTO> openTalkDTOS = mapStructMapper.toOpenTalkDTOs(
+    public List<OpenTalkDTO> findDetailedOpenTalksOfEmployee(Long id) {
+        return mapStructMapper.toOpenTalkDTOs(
                 openTalkRepository
                         .findOpenTalksByEmployeeId(id)
                         .orElseThrow(() -> new EntityNotFoundException("Employee id is not existed " + id)));
-        return ResponseEntity.status(HttpStatus.OK).body(openTalkDTOS);
+
+    }
+
+    @Override
+    public Page<OpenTalkDTO> findAllWithPagination(Integer limit, Integer page) {
+        if (page != null && limit != null) {
+            Sort idSort = Sort.by("id");
+            Pageable pageable = PageRequest.of(page - 1, limit, idSort);
+            Page<OpenTalk> pageEmployee = openTalkRepository.findAll(pageable);
+            return pageEmployee.map(mapStructMapper::toDTO);
+        } else {
+            return new PageImpl<>(findAllOpenTalk());
+        }
+
     }
 
 

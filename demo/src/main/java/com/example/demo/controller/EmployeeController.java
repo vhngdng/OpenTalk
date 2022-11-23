@@ -4,11 +4,13 @@ import com.example.demo.dto.Display.AccountDisplayDTO;
 import com.example.demo.dto.EmployeeDTO;
 import com.example.demo.service.Impl.EmployeeService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -19,6 +21,8 @@ import java.util.List;
 @RequestMapping("/admin")
 //@RequestMapping("${path_admin}")   // use properties file
 @RequiredArgsConstructor
+@Slf4j
+@PreAuthorize("hasRole('ADMIN')")
 public class EmployeeController {
 
     private final EmployeeService employeeService;
@@ -36,6 +40,7 @@ public class EmployeeController {
     public ResponseEntity<Page<EmployeeDTO>> showAllEmployeeWithPagination(
             @RequestParam(value = "limit", required = false) Integer limit,
             @RequestParam(value = "page", required = false) Integer page) {
+        logger.info("================================================");
         Page<EmployeeDTO> pageResult = employeeService.findAllWithPagination(limit, page);
         return ResponseEntity
                 .status(HttpStatus.OK)

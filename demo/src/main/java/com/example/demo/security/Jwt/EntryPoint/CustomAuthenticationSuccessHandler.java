@@ -22,6 +22,8 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
+
+
         String accessToken = jwtUtil.generateAccessToken(authentication);
         String refreshToken = jwtUtil.generateRefreshToken(authentication);
         Map<String, String> tokens = new HashMap<>();
@@ -29,5 +31,6 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
         tokens.put("refresh_Token", refreshToken);
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         new ObjectMapper().writeValue(response.getOutputStream(), tokens);
+        response.setHeader("tokens", tokens.toString());
     }
 }

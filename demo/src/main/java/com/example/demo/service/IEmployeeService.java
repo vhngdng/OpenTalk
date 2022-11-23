@@ -4,7 +4,6 @@ import com.example.demo.dto.Display.AccountDisplayDTO;
 import com.example.demo.dto.EmployeeDTO;
 import com.example.demo.ENUM.ERole;
 import org.springframework.data.domain.Page;
-import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
@@ -26,5 +25,5 @@ public interface IEmployeeService {
 
     void addRoleToUser(String username, ERole role);
 
-    ResponseEntity<List<EmployeeDTO>> findAllAdminAccount();
+    List<EmployeeDTO> findAllAdminAccount();
 }

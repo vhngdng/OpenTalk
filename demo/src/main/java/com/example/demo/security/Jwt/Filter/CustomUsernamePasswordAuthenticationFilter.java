@@ -1,21 +1,32 @@
 package com.example.demo.security.Jwt.Filter;
 
-//@Slf4j
-//@NoArgsConstructor
-//@Component
+//@Configuration
 public class CustomUsernamePasswordAuthenticationFilter{}
 //        extends UsernamePasswordAuthenticationFilter {
-
-//    private AuthenticationManager authenticationManager;
 //    @Autowired
 //    private JwtTokenUtil jwtUtil;
-
-//    @Autowired
-//    @Override
-//    public void setAuthenticationManager(AuthenticationManager authenticationManager) {
-//        this.setAuthenticationManager(super.getAuthenticationManager());
-//    }
-
+////    @Autowired
+////    private AuthenticationConfiguration authenticationConfiguration;
+////    @Bean
+////    public AuthenticationManager getAuthenticationManager() {
+////        try {
+////            return authenticationConfiguration.getAuthenticationManager();
+////        } catch (Exception e) {
+////            throw new RuntimeException(e);
+////        }
+////    }
+////    @Autowired
+////    public CustomUsernamePasswordAuthenticationFilter(AuthenticationManager authenticationManager, JwtTokenUtil jwtUtil) {
+////        this.setAuthenticationManager(super.getAuthenticationManager());
+////        this.jwtUtil = jwtUtil;
+////    }
+//
+//    //    @Autowired
+////    @Override
+////    public void setAuthenticationManager(AuthenticationManager authenticationManager) {
+////        this.setAuthenticationManager(super.getAuthenticationManager());
+////    }
+//
 //
 //    @Override
 //    public Authentication attemptAuthentication(HttpServletRequest request,

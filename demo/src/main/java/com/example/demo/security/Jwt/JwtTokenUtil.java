@@ -1,6 +1,7 @@
 package com.example.demo.security.Jwt;
 
 import com.example.demo.constance.Constant;
+import com.example.demo.exception.AccessDeniedException;
 import com.example.demo.security.SecureService.UserDetailImpl;
 import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
@@ -41,9 +42,7 @@ public class JwtTokenUtil {
 
     public String generateAccessToken(Authentication authentication) {
         UserDetailImpl userDetailImpl = (UserDetailImpl) authentication.getPrincipal();
-//        System.out.println("=========================================");
-//        System.out.println(secret);
-//        System.out.println(jwtCookie);
+
         return Jwts
                 .builder()
                 .setSubject(userDetailImpl.getUsername())
@@ -83,8 +82,12 @@ public class JwtTokenUtil {
 
     public boolean validateJwtToken(String authToken) {
         try {
-            Jwts.parser().setSigningKey(secret).parseClaimsJws(authToken);
-            return true;
+            return !Jwts.parser().setSigningKey(secret).parseClaimsJws(authToken).getBody().getSubject().isBlank();
+//            final String username = getUserNameFromJwtToken(authToken);
+//            if (username.equals())
+//            return true;
+        }catch (AccessDeniedException e){
+            throw new AccessDeniedException("Access denied");
         } catch (SignatureException e) {
             logger.error("Invalid JWT signature: {}", e.getMessage());
         } catch (MalformedJwtException e) {

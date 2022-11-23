@@ -16,8 +16,6 @@ import com.github.javafaker.Faker;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
@@ -31,7 +29,7 @@ import java.util.*;
 @Transactional(rollbackOn = {Exception.class, Throwable.class})
 public class EmployeeService implements IEmployeeService {
 
-//    private final Logger logger = LoggerFactory.getLogger(EmployeeService.class);
+    //    private final Logger logger = LoggerFactory.getLogger(EmployeeService.class);
     private final EmployeeRepository employeeRepository;
     private final MapStructMapper mapStructMapper;
     private final BranchService branchService;
@@ -39,6 +37,7 @@ public class EmployeeService implements IEmployeeService {
     private final RoleService roleService;
     private final BranchRepository branchRepository;
     private final Faker faker;
+
     @Autowired
     public EmployeeService(EmployeeRepository employeeRepository,
                            MapStructMapper mapStructMapper,
@@ -97,7 +96,6 @@ public class EmployeeService implements IEmployeeService {
     }
 
     public EmployeeDTO save(EmployeeDTO employeeDTO) {
-
         Employee employee = new Employee();
         if (employeeDTO.getId() == null) employeeDTO.setId(0L);
         if (duplicateName(employeeDTO.getUserName())) {
@@ -124,16 +122,19 @@ public class EmployeeService implements IEmployeeService {
         Employee employeeUpdate = employeeRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Not existed id= " + id));
 //        log.info("audit create at: " + employeeUpdate.getAudit().getLastUpdate().toString());
-        if(employeeUpdate.getUserName()
-                .equals(model.getUserName())) throw new DuplicateEntityException("Username is duplicate: " + model.getUserName());
-        if(employeeUpdate.getEmail()
-                .equals(model.getEmail())) throw new DuplicateEntityException("Email is duplicate: " + model.getEmail());
+        if (employeeUpdate.getUserName()
+                .equals(model.getUserName()))
+            throw new DuplicateEntityException("Username is duplicate: " + model.getUserName());
+        if (employeeUpdate.getEmail()
+                .equals(model.getEmail()))
+            throw new DuplicateEntityException("Email is duplicate: " + model.getEmail());
         mapStructMapper.updateEmployeeFromDTO(model, employeeUpdate);
 //        Audit audit = new Audit();
 //        audit.setLastUpdate(LocalDateTime.now());
 //        employeeUpdate.getAudit().setLastUpdate(LocalDateTime.now());
 //        employeeUpdate.setAudit(audit);
-        if (employeeUpdate.getAudit() != null) log.info("audit create at: " + employeeUpdate.getAudit().getLastUpdate().toString());
+        if (employeeUpdate.getAudit() != null)
+            log.info("audit create at: " + employeeUpdate.getAudit().getLastUpdate().toString());
         return mapStructMapper.toDTO(employeeUpdate);
     }
 
@@ -165,9 +166,9 @@ public class EmployeeService implements IEmployeeService {
     }
 
     @Override
-    public ResponseEntity<List<EmployeeDTO>> findAllAdminAccount() {
-        List<EmployeeDTO> admins = mapStructMapper.toEmployeeDTOs(employeeRepository.getAllAdminAccount().orElseThrow(() -> new EntityNotFoundException("Danh sach Admin khong co")));
-        return ResponseEntity.status(HttpStatus.OK).body(admins);
+    public List<EmployeeDTO> findAllAdminAccount() {
+        return mapStructMapper.toEmployeeDTOs(employeeRepository.getAllAdminAccount().orElseThrow(() -> new EntityNotFoundException("Danh sach Admin khong co")));
+
 
     }
 

@@ -2,7 +2,7 @@ package com.example.demo.service;
 
 import com.example.demo.dto.Display.OpenTalkDisplayDTO;
 import com.example.demo.dto.OpenTalkDTO;
-import org.springframework.http.ResponseEntity;
+import org.springframework.data.domain.Page;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;
@@ -15,9 +15,11 @@ public interface IOpenTalkService {
 
     OpenTalkDTO updateOpenTalk(@NotNull OpenTalkDTO model, Long id);
 
-    ResponseEntity<Void> deleteById(Long id);
+    void deleteById(Long id);
 
-    ResponseEntity<List<OpenTalkDisplayDTO>> findAllOpenTalksOfEmployee(Long id);
+    List<OpenTalkDisplayDTO> findAllOpenTalksOfEmployee(Long id);
 
-    ResponseEntity<List<OpenTalkDTO>> findDetailedOpenTalksOfEmployee(Long id);
+    List<OpenTalkDTO> findDetailedOpenTalksOfEmployee(Long id);
+
+    Page<OpenTalkDTO> findAllWithPagination(Integer limit, Integer page);
 }

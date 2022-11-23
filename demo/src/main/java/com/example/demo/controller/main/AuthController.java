@@ -32,6 +32,7 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<String> authenticationUser(@RequestBody @Valid LoginDTO loginDTO) throws Exception {
 //        try {
+        logger.info("=========================================================================");
             System.out.println(loginDTO.getUsername());
             Authentication authentication =
 //                authenticationManagerBuilder.getObject()
@@ -39,6 +40,7 @@ public class AuthController {
                             .authenticate(new UsernamePasswordAuthenticationToken(loginDTO.getUsername(), loginDTO.getPassword()));
             System.out.println("point 0 ==========================================================");
             String jwt = new JwtTokenUtil().generateAccessToken(authentication);
+//            jwtUtils.validateJwtToken(jwt);
             logger.info("jwt from controller" + jwt);
             SecurityContextHolder.getContext().setAuthentication(authentication);
             System.out.println("point1 1 ===================================================");
