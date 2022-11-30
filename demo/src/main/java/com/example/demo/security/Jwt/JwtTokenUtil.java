@@ -1,6 +1,6 @@
 package com.example.demo.security.Jwt;
 
-import com.example.demo.constance.Constant;
+import com.example.demo.CONST.Constant;
 import com.example.demo.exception.AccessDeniedException;
 import com.example.demo.security.SecureService.UserDetailImpl;
 import io.jsonwebtoken.*;

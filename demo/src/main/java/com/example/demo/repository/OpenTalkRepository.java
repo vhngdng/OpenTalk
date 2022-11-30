@@ -13,4 +13,6 @@ import java.util.Optional;
 public interface OpenTalkRepository extends JpaRepository<OpenTalk, Long> {
     @Query("select o from OpenTalk o where o.employee.id=:userId")
     Optional<List<OpenTalk>> findOpenTalksByEmployeeId(@Param("userId") Long userId);
+
+
 }

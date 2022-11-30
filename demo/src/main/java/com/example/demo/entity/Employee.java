@@ -11,6 +11,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
+import javax.validation.constraints.Size;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -30,6 +31,7 @@ public class Employee {
     @Column()
     private Long id;
     @Column(name = "username", length = 64, nullable = false, unique = true)
+    @Size(min = 4, max = 64, message = "The length of password is not valid")
     private String userName;
 
     @Column(name = "full_name", length = 64, nullable = false)
@@ -39,6 +41,7 @@ public class Employee {
     @Email
     private String email;
     @Column(name = "password", length = 64, nullable = false)
+    @Size(min = 4, max = 64, message = "The length of password is not valid")
     private String password;
 
     @Embedded

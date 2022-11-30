@@ -1,81 +1,42 @@
 package com.example.demo.controller;
 
-import com.example.demo.dto.Display.AccountDisplayDTO;
-import com.example.demo.dto.EmployeeDTO;
+
+import com.example.demo.dto.Display.OpenTalkDisplayDTO;
 import com.example.demo.service.Impl.EmployeeService;
+import com.example.demo.service.Impl.OpenTalkService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Page;
-import org.springframework.http.HttpStatus;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
+import javax.servlet.http.HttpServletRequest;
+import java.security.Principal;
 import java.util.List;
 
 @RestController
-@RequestMapping("/admin")
+//@RequestMapping("/admin")
 //@RequestMapping("${path_admin}")   // use properties file
 @RequiredArgsConstructor
 @Slf4j
-@PreAuthorize("hasRole('ADMIN')")
+//@PreAuthorize("hasRole('EMPLOYEE')")    //-> @PreAuthorize se override lai antmacher trong WebSecurityConfig
+
+//@PreAuthorize("hasAnyRole('EMPLOYEE', 'ADMIN')")
+@RequestMapping("/employee")
 public class EmployeeController {
-
-    private final EmployeeService employeeService;
-    private static final Logger logger = LoggerFactory.getLogger(EmployeeController.class);
-
-    @GetMapping("/accounts")        //find all account with a few details
-    public ResponseEntity<List<AccountDisplayDTO>> findAllAccount() {
-        List<AccountDisplayDTO> accountDisplayDTO = employeeService.findAllAccount();
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(accountDisplayDTO);
-    }
-
-    @GetMapping("/managedEmployees") //(path: /managed-employees/limit=2?page=2)
-    public ResponseEntity<Page<EmployeeDTO>> showAllEmployeeWithPagination(
-            @RequestParam(value = "limit", required = false) Integer limit,
-            @RequestParam(value = "page", required = false) Integer page) {
-        logger.info("================================================");
-        Page<EmployeeDTO> pageResult = employeeService.findAllWithPagination(limit, page);
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(pageResult);
-    }
-    @GetMapping("/{id}")
-    public ResponseEntity<EmployeeDTO> findEmployeeById(@PathVariable("id") Long id) {
-        return ResponseEntity.status(HttpStatus.OK).body(employeeService.findById(id));
-    }
-
-    @PostMapping("/employee")
-    public ResponseEntity<EmployeeDTO> createEmployee(@Valid @RequestBody EmployeeDTO model) {
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(employeeService.save(model));
-    }
-
-    @PutMapping("/employee/{id}")
-    public ResponseEntity<EmployeeDTO> updateEmployee(
-            @NotNull @RequestBody() EmployeeDTO model,
-            @PathVariable Long id) {
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(employeeService.updateEmployee(model, id));
-    }
-
-    @DeleteMapping("/employee/{id}")                // delete employee
-    public ResponseEntity<Void> deleteEmployee(@PathVariable("id") Long id) {
-        logger.info(employeeService.findById(id).toString());
-        employeeService.deleteById(id);
-        return ResponseEntity.noContent().build();
-    }
-
-    @GetMapping("/adminAccount")
-    public ResponseEntity<List<EmployeeDTO>> findAllAdminAccount() {
-        return employeeService.findAllAdminAccount();
+    @Autowired
+    private AuthenticationConfiguration authenticationConfiguration;
+    @Autowired
+    private EmployeeService employeeService;
+    @Autowired
+    private OpenTalkService openTalkService;
+    @GetMapping("/opentalks")
+    public ResponseEntity<List<OpenTalkDisplayDTO>> findAllOpenTalkDisplay(HttpServletRequest request) {
+        Principal userPrincipal = request.getUserPrincipal();
+        List<OpenTalkDisplayDTO> openTalkDisplayDTOS = openTalkService.findOpenTalkOfLoginUser(userPrincipal);
+        return ResponseEntity.ok(openTalkDisplayDTOS);
     }
 }

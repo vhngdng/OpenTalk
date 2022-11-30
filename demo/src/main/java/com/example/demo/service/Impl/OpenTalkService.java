@@ -4,6 +4,7 @@ import com.example.demo.dto.BranchDTO;
 import com.example.demo.dto.Display.OpenTalkDisplayDTO;
 import com.example.demo.dto.EmployeeDTO;
 import com.example.demo.dto.OpenTalkDTO;
+import com.example.demo.entity.Employee;
 import com.example.demo.entity.OpenTalk;
 import com.example.demo.mapper.MapStructMapper;
 import com.example.demo.repository.BranchRepository;
@@ -15,11 +16,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
-import org.springframework.security.access.prepost.PostFilter;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
+import java.security.Principal;
 import java.util.List;
 
 @Service
@@ -82,7 +83,8 @@ public class OpenTalkService implements IOpenTalkService {
     }
 
     @Override
-    @PostFilter("hasRole('ADMIN') or filterObject.name == authentication.name")
+
+
     public List<OpenTalkDisplayDTO> findAllOpenTalksOfEmployee(Long id) {
         return mapStructMapper.toDisplayDTO(
                 openTalkRepository
@@ -92,6 +94,7 @@ public class OpenTalkService implements IOpenTalkService {
 
     @Override
     public List<OpenTalkDTO> findDetailedOpenTalksOfEmployee(Long id) {
+
         return mapStructMapper.toOpenTalkDTOs(
                 openTalkRepository
                         .findOpenTalksByEmployeeId(id)
@@ -110,6 +113,20 @@ public class OpenTalkService implements IOpenTalkService {
             return new PageImpl<>(findAllOpenTalk());
         }
 
+    }
+
+    @Override
+    public List<OpenTalkDisplayDTO> findOpenTalkOfLoginUser(Principal userPrincipal) {
+        String username = userPrincipal.getName();
+        return mapStructMapper.toDisplayDTO(findByEmPloyeeName(username));
+    }
+
+    @Override
+    public List<OpenTalk> findByEmPloyeeName(String username) {
+        Employee employee = employeeRepository.findByUserName(username)
+                .orElseThrow(() -> new EntityNotFoundException("userName nay khong ton tai"));
+        return openTalkRepository.findOpenTalksByEmployeeId(employee.getId())
+                .orElseThrow(() -> new EntityNotFoundException("userName nay chua host openTalk"));
     }
 
 

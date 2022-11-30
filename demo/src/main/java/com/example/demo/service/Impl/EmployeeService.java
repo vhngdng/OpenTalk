@@ -168,9 +168,55 @@ public class EmployeeService implements IEmployeeService {
     @Override
     public List<EmployeeDTO> findAllAdminAccount() {
         return mapStructMapper.toEmployeeDTOs(employeeRepository.getAllAdminAccount().orElseThrow(() -> new EntityNotFoundException("Danh sach Admin khong co")));
-
-
     }
+
+//    @Override
+//    public List<String> findAllEmailExceptHost(Long id) {
+//        String removedEmail = employeeRepository
+//                .findById(id)
+//                .orElseThrow(() -> new EntityNotFoundException("Id is not exist: " + id))
+//                .getEmail();
+//        List<Employee> employees = employeeRepository.findAll();
+//        List<String> emails = employees.stream().map(Employee::getEmail).collect(Collectors.toList());
+//        emails.remove(removedEmail);
+//        return emails;
+//    }
+
+//    @Override
+//    public List<String> findAllFullNameExceptHost(Long id) {
+//        String removedFullName = employeeRepository
+//                .findById(id)
+//                .orElseThrow(() -> new EntityNotFoundException("Id is not exist: " + id))
+//                .getFullName();
+//        List<Employee> employees = employeeRepository.findAll();
+//        List<String> fullNames = employees.stream().map(Employee::getFullName).collect(Collectors.toList());
+//        fullNames.remove(removedFullName);
+//        return fullNames;
+//    }
+    @Override
+    public List<EmployeeDTO> findAllExceptHost(Long id) {
+        Employee host = employeeRepository
+                .findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Id is not exist: " + id));
+        List<Employee> employees = new ArrayList<>();
+        employees = (List<Employee>) ((ArrayList) employeeRepository.findAll()).clone();
+        employees.remove(host);
+        return mapStructMapper.toEmployeeDTOs(employees);
+    }
+
+    @Override
+    public long size() {
+        return employeeRepository.count();
+    }
+
+    public EmployeeDTO findByName(String name) {
+        return mapStructMapper.toDTO(employeeRepository
+                .findByUserName(name).stream().findFirst()
+                .orElseThrow(() -> new EntityNotFoundException("Not found name" + name))
+        );
+    }
+
+
 
     public void initEmployee() {
         Random rd = new Random();

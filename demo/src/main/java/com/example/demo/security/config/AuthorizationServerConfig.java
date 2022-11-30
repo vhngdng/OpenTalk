@@ -1,6 +1,6 @@
 package com.example.demo.security.config;
 
-import com.example.demo.constance.Constant;
+import com.example.demo.CONST.Constant;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;

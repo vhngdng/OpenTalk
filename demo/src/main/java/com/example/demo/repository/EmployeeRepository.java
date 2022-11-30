@@ -29,4 +29,7 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> /*, Re
     Boolean existsByUserName(String username);
 
     Boolean existsByEmail(String email);
+
+    @Query(value = "SELECT e from Employee e where  e.branch.id =: branchId")
+    Optional<List<Employee>> findEmployeeByBranchId (@Param("branchId") Long branchId);
 }

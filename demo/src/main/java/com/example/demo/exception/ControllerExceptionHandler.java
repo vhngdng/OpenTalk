@@ -68,4 +68,22 @@ public class ControllerExceptionHandler {
                 LocalDateTime.now(),
                 exception.getMessage());
     }
+
+    @ExceptionHandler( value = {InternalServerException.class})
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorMessage internalServerException(InternalServerException exception){
+        return new ErrorMessage(
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                LocalDateTime.now(),
+                exception.getMessage());
+    }
+
+    @ExceptionHandler( value = {MailScheduleException.class})
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorMessage MailScheduleException(MailScheduleException exception){
+        return new ErrorMessage(
+                HttpStatus.BAD_REQUEST.value(),
+                LocalDateTime.now(),
+                exception.getMessage());
+    }
 }

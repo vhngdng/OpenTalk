@@ -2,14 +2,26 @@ package com.example.demo.mapper;
 
 import com.example.demo.Audit.Audit;
 import com.example.demo.Audit.AuditDTO.AuditDTO;
-import com.example.demo.dto.*;
+import com.example.demo.dto.BranchDTO;
 import com.example.demo.dto.Display.AccountDisplayDTO;
 import com.example.demo.dto.Display.OpenTalkDisplayDTO;
-import com.example.demo.entity.*;
+import com.example.demo.Scheduler.ScheduleDto.Request;
+import com.example.demo.Scheduler.ScheduleDto.Response;
+import com.example.demo.dto.EmployeeDTO;
+import com.example.demo.dto.OpenTalkDTO;
+import com.example.demo.dto.RoleDTO;
+import com.example.demo.entity.Branch;
+import com.example.demo.Scheduler.EmailEntity.MailSchedule;
+import com.example.demo.entity.Employee;
+import com.example.demo.entity.OpenTalk;
 import com.example.demo.entity.UserRole.Role;
 import org.mapstruct.*;
 
-import java.util.*;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.Set;
 
 @Mapper(componentModel = "spring")          // what is componentModel, why value = "spring"
 public interface MapStructMapper {
@@ -100,4 +112,27 @@ public interface MapStructMapper {
     AuditDTO toDTO (Audit audit);
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     Audit toEntity (AuditDTO auditDTO);
+
+    default Response toResponse(MailSchedule mailSchedule) {
+        Response response = new Response();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
+        response.setScheduleId(mailSchedule.getScheduleId());
+        response.setHost(mailSchedule.getUsername());
+        response.setScheduledTime(LocalDateTime.parse(mailSchedule.getScheduleDateTime(), formatter));
+        response.setZoneId(ZoneId.of(mailSchedule.getScheduleZoneId()));
+        return response;
+    }
+
+    default MailSchedule toMailSchedule(Request request) {
+        MailSchedule mailSchedule = new MailSchedule();
+        mailSchedule.setDeleted(false);
+        mailSchedule.setScheduleId(request.getScheduleId());
+//        mailSchedule.setSubject(request.getSubject());
+//        mailSchedule.setUsername(request.getUsername());
+//        mailSchedule.setScheduleDateTime(request.getScheduledTime().toString());
+//        mailSchedule.setScheduleZoneId(request.getZoneId().toString());
+        return mailSchedule;
+    }
+
+    List<Response> getResponseFromMailSchedule (List<MailSchedule> mailSchedule);
 }

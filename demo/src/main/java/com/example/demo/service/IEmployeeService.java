@@ -1,8 +1,8 @@
 package com.example.demo.service;
 
+import com.example.demo.ENUM.ERole;
 import com.example.demo.dto.Display.AccountDisplayDTO;
 import com.example.demo.dto.EmployeeDTO;
-import com.example.demo.ENUM.ERole;
 import org.springframework.data.domain.Page;
 
 import java.util.List;
@@ -26,4 +26,11 @@ public interface IEmployeeService {
     void addRoleToUser(String username, ERole role);
 
     List<EmployeeDTO> findAllAdminAccount();
+
+//    List<String> findAllEmailExceptHost(Long id);
+//
+//    List<String> findAllFullNameExceptHost(Long id);
+    List<EmployeeDTO> findAllExceptHost(Long id);
+
+    long size();
 }

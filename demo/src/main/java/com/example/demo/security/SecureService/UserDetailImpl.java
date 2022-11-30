@@ -13,15 +13,11 @@ import java.util.Collection;
 public class UserDetailImpl implements UserDetails {
     private String userName;
     private String password;
-
     private Collection<? extends GrantedAuthority> roles;
-
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return roles;
     }
-
     @Override
     public String getPassword() {
 

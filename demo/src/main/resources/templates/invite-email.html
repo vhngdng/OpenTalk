@@ -1,0 +1,36 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Spring boot email template with Thymeleaf</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link href='http://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'/>
+    <!-- use the font -->
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            font-size: 48px;
+        }
+    </style>
+</head>
+<body>
+<p th:text="#{email.invite.opentalk.greeting}">Invitation</p>
+<p th:text="#{email.invite.opentalk.text(${opentalkTopicDTOS.get(0).getTime()})}">SCHEDULE DURING THE WEEK,</p>
+<p th:each="opentalkTopic: ${opentalkTopicDTO}">
+      <span
+              th:each="companyBranch:${opentalkTopic.getCompanyBranchDTOs()}"
+              th:text="${'['+companyBranch.getCompanyBranchName()+']' }"
+      ></span>companyBranch
+    <span th:text="${'TOPIC: '+ #strings.toUpperCase(opentalkTopic.getTopicName()) + '-'} "></span>
+    <span th:text="#{email.invite.opentalk.host} ">Host by</span>
+    <span th:each="employee:${opentalkTopic.getEmployeeDTOs()}" th:text="${employee.toFullName()} + ', '"></span>
+</p>
+<p th:text="#{email.invite.opentalk.host.guest}">Guest</p>
+<p th:each="guest: ${guests}" th:text="${guest.toFullName()}"></p>
+<p>
+    <span th:text="#{email.invite.opentalk.text2}">Regards, </span>
+    <br />
+    <em th:text="#{email.invite.opentalk.signature}">JHipster.</em>
+</p>
+</body>
+</html>
