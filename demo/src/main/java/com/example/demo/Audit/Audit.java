@@ -29,29 +29,9 @@ public class Audit {
     @LastModifiedDate
     @Column(name = "updated_at")
     private LocalDateTime lastUpdate;
-//    @ManyToOne(fetch = FetchType.EAGER,
-//    cascade = CascadeType.ALL)
-//    @JoinColumn(name = "updated_by")
-//    @LastModifiedBy
-//    @CreatedBy
-//    private Employee employee;
 
     @LastModifiedBy
     @Column(name = "upadted_by")
-//    @CreatedBy
-//    @JsonProperty("updated_by")
     private String userName;
 
-
-
-
-//    @PrePersist
-//    public void prePersist() {
-//        this.createdAt = LocalDateTime.now();
-//    }
-//
-//    @PreUpdate
-//    public void lastUpdate( ) {
-//        this.lastUpdate = LocalDateTime.now();
-//    }
 }

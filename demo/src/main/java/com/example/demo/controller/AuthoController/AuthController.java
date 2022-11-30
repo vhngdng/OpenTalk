@@ -23,8 +23,7 @@ public class AuthController {
 
   @Autowired
   private AuthenticationConfiguration authenticationConfiguration;
-  //    @Autowired
-//    private AuthenticationManagerBuilder authenticationManagerBuilder;
+
   private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
   @Autowired
   private JwtTokenUtil jwtUtils;
@@ -36,11 +35,9 @@ public class AuthController {
     Authentication authentication =
             authenticationConfiguration.getAuthenticationManager()
                     .authenticate(new UsernamePasswordAuthenticationToken(loginDTO.getUsername(), loginDTO.getPassword()));
-    System.out.println("point 0 ==========================================================");
     String jwt = new JwtTokenUtil().generateAccessToken(authentication);
     logger.info("jwt from controller" + jwt);
     SecurityContextHolder.getContext().setAuthentication(authentication);
-    System.out.println("point1 1 ===================================================");
 
     return ResponseEntity.status(HttpStatus.OK).header(HttpHeaders.AUTHORIZATION, jwt).body("Bearer Token: " + jwt);
   }

@@ -13,31 +13,20 @@ import java.util.Optional;
 @Configuration
 @EnableJpaAuditing(auditorAwareRef = "auditorProvider")
 public class JpaAuditingConfig {
-    @Bean
-    public AuditorAware<String> auditorProvider() {
-        return new AuditorAware() {
-            @Override
-            public Optional<String> getCurrentAuditor() {
-                if (SecurityContextHolder.getContext().getAuthentication() != null) {
-                    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-                    UserDetailImpl userDetail = (UserDetailImpl) authentication.getPrincipal();
-                    return Optional.ofNullable(userDetail.getUsername());
-                }
-                return Optional.empty();
-            }
-        };
-    }
-
-
-    public static class AuditorAwareImpl implements  AuditorAware<String> {
-        @Override
-        public Optional<String> getCurrentAuditor() {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            if(authentication == null || authentication.isAuthenticated()) {
-                return Optional.empty();
-            }
-            return Optional.ofNullable(authentication.getName());
+  @Bean
+  public AuditorAware<String> auditorProvider() {
+    return new AuditorAware() {
+      @Override
+      public Optional<String> getCurrentAuditor() {
+        if (SecurityContextHolder.getContext().getAuthentication() != null) {
+          Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+          UserDetailImpl userDetail = (UserDetailImpl) authentication.getPrincipal();
+          return Optional.ofNullable(userDetail.getUsername());
         }
-    }
+        return Optional.empty();
+      }
+    };
+  }
+
 
 }
