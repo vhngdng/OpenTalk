@@ -1,5 +1,7 @@
 package com.example.demo;
 
+import com.example.demo.dto.OpenTalkDTO;
+import com.example.demo.mapper.MapStructMapper;
 import com.example.demo.repository.BranchRepository;
 import com.example.demo.repository.EmployeeRepository;
 import com.example.demo.repository.OpenTalkRepository;
@@ -7,11 +9,13 @@ import com.example.demo.repository.RoleRepository;
 import com.example.demo.service.Impl.EmployeeService;
 import com.example.demo.service.Impl.RoleService;
 import com.github.javafaker.Faker;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.MockBeans;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.annotation.Rollback;
 
 @DataJpaTest
@@ -27,9 +31,11 @@ public class EmployeeRepositoryTests {
 
     @Autowired
     private EmployeeRepository employeeRepository;
-
+    @Autowired
+    private MapStructMapper mapper;
     @MockBean
     private BranchRepository branchRepository;
+
 
     @MockBean
     private OpenTalkRepository openTalkRepository;
@@ -112,5 +118,12 @@ public class EmployeeRepositoryTests {
 //                    branchRepository.findAll().get(rd.nextInt((int) branchRepository.count())));
 //            openTalkRepository.save(openTalkTest);
 //        }
+
+
+    @Test
+    public ResponseEntity<OpenTalkDTO> findNearest () {
+        OpenTalkDTO openTalkDTO = mapper.toDTO(openTalkRepository.findNearestOpenTalk());
+        return ResponseEntity.ok(openTalkDTO);
+    }
     }
 //}

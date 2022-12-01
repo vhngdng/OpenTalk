@@ -2,6 +2,8 @@ package com.example.demo.controller;
 
 import com.example.demo.dto.Display.OpenTalkDisplayDTO;
 import com.example.demo.dto.OpenTalkDTO;
+import com.example.demo.mapper.MapStructMapper;
+import com.example.demo.repository.OpenTalkRepository;
 import com.example.demo.service.Impl.OpenTalkService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -11,6 +13,10 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.NotNull;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoField;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -19,7 +25,10 @@ import java.util.List;
 public class OpenTalkController {
     @Autowired
     private OpenTalkService openTalkService;
-
+    @Autowired
+    private MapStructMapper mapStructMapper;
+    @Autowired
+    private OpenTalkRepository openTalkRepository;
 
     @GetMapping("/employee/all-opentalks")        //find all opentalk with a few details
     public ResponseEntity<List<OpenTalkDisplayDTO>> findAllOpenTalk() {
@@ -70,6 +79,31 @@ public class OpenTalkController {
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("/testnhanh")
+    public ResponseEntity<List<OpenTalkDTO>> findNearest () {
+
+        LocalDateTime monday = LocalDate
+                .now()
+                .minusDays(LocalDate.now().get(ChronoField.DAY_OF_WEEK) - 1)
+                .atStartOfDay();
+        LocalDateTime sunday = LocalDate
+                .now()
+                .plusDays(7 - LocalDate.now().get(ChronoField.DAY_OF_WEEK))
+                .atStartOfDay();
+
+        List<OpenTalkDTO> openTalkDTO = mapStructMapper.toOpenTalkDTOs(openTalkRepository.findNearestOpenTalk(monday, sunday));
+        System.out.println(openTalkDTO);
+        return ResponseEntity.ok(openTalkDTO);
+    }
+
+    @GetMapping("/testnhanh2")
+    public ResponseEntity<List<OpenTalkDTO>> findNearestTest () {
+
+        List<OpenTalkDTO> openTalkDTO = new ArrayList<>();
+        openTalkRepository.findNearestOpenTalk2();
+        System.out.println(openTalkDTO);
+        return ResponseEntity.ok(openTalkDTO);
+    }
 
 }
 

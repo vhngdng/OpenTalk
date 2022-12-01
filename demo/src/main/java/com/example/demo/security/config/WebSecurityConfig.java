@@ -20,13 +20,12 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @EnableWebSecurity
 @RequiredArgsConstructor
-@EnableGlobalMethodSecurity(                         // enable @PreAuthorize and @PostAuthorize
-        prePostEnabled = true,
+@EnableGlobalMethodSecurity(
+        prePostEnabled = true,  // enable @PreAuthorize and @PostAuthorize
         securedEnabled = true,
         jsr250Enabled = true
 )
 @Slf4j
-//@Order(1)
 public class WebSecurityConfig {
     private final UserDetailServiceImpl userDetailServiceImpl;
     private final AuthEntryPointJwt authEntryPointJwt;
@@ -47,16 +46,11 @@ public class WebSecurityConfig {
         authProvider.setPasswordEncoder(passwordEncoder());
         return authProvider;
     }
-//    @Bean
-//    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
-//        return authenticationConfiguration.getAuthenticationManager();
-//    }
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
         return (web) -> web.ignoring().antMatchers("/images/**", "/js/**", "/webjars/**");
     }
-
     @Bean
     @Order(Ordered.HIGHEST_PRECEDENCE)
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {

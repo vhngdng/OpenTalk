@@ -29,6 +29,5 @@ public class EmailSchedulerController {
     return ResponseEntity.status(HttpStatus.CREATED).body(response);
   }
 
-
 }
 

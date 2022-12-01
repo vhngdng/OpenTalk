@@ -51,6 +51,8 @@
             <artifactId>jackson-databind</artifactId>
             <version>2.14.0</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-freemarker -->
+
 
         <dependency>
             <groupId>org.mapstruct</groupId>

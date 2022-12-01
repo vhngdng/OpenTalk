@@ -13,15 +13,8 @@ import org.springframework.scheduling.quartz.QuartzJobBean;
 @Slf4j
 @RequiredArgsConstructor
 public class EmailScheduleJob extends QuartzJobBean {
-
-
     private final EmailService emailService;
 
-
-//    @PostConstruct
-//    public void postConstruct() {
-//        log.info(" ");
-//    }
 
     @Async
     @Override
@@ -31,8 +24,7 @@ public class EmailScheduleJob extends QuartzJobBean {
         String from = jobDataMap.getString("from");
         String subject = jobDataMap.getString("subject");
         String text = jobDataMap.getString("text");
-
-
+//        OpenTalkDTO openTalkDTO = jobDataMap.get()
 //        int scheduleId = jobDataMap.getInt("scheduleId");
         Email email = new Email();
         email.setFrom(from);
@@ -41,7 +33,7 @@ public class EmailScheduleJob extends QuartzJobBean {
 //        email.setBcc();
 
 
-        emailService.sendMail(email);
+//        emailService.sendMail(email, openTalkDTO);
 //        scheduleService.deleteEmailSchedule(scheduleId);
     }
 

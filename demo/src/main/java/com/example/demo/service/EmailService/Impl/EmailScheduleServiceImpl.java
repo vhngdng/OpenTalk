@@ -5,9 +5,11 @@ import com.example.demo.Scheduler.EmailEntity.MailSchedule;
 import com.example.demo.Scheduler.ScheduleDto.Request;
 import com.example.demo.Scheduler.ScheduleDto.Response;
 import com.example.demo.Scheduler.job.EmailScheduleJob;
+import com.example.demo.dto.OpenTalkDTO;
 import com.example.demo.exception.InternalServerException;
 import com.example.demo.mapper.MapStructMapper;
 import com.example.demo.repository.MailScheduleRepository;
+import com.example.demo.repository.OpenTalkRepository;
 import com.example.demo.service.EmailService.EmailScheduleService;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.*;
@@ -15,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,6 +41,8 @@ public class EmailScheduleServiceImpl implements EmailScheduleService {
   private MapStructMapper mapper;
   @Autowired
   private MailScheduleRepository mailScheduleRepository;
+  @Autowired
+  private OpenTalkRepository openTalkRepository;
 
 
   @PostConstruct
@@ -63,8 +68,10 @@ public class EmailScheduleServiceImpl implements EmailScheduleService {
 
   @Override
   @Transactional
+  @Secured("ROLE_ADMIN")
   public String createMailSchedule(Request request) throws SchedulerException {
-    JobDetail jobDetail = buildJobDetail(request);
+//    openTalkRepository.findNearestOpenTalk();
+    JobDetail jobDetail = buildJobDetail(request, new OpenTalkDTO());
     log.info("descrip of jobDetail" + jobDetail.getDescription());
     Trigger cronTrigger = buildJobTrigger(jobDetail);
     log.info("descrip of trigger" + cronTrigger.getNextFireTime());
@@ -96,8 +103,8 @@ public class EmailScheduleServiceImpl implements EmailScheduleService {
                     .inTimeZone(TimeZone.getTimeZone(ZoneId.systemDefault())))
             .build();
   }
-
-  public JobDetail buildJobDetail(Request request) {
+  @Secured("ROLE_ADMIN")   //  == @PreAuthorize(“hasRole(‘ROLE_ADMIN')”)
+  public JobDetail buildJobDetail(Request request, OpenTalkDTO openTalkDTO) {
     JobDataMap jobDataMap = new JobDataMap();
     String username = SecurityContextHolder.getContext().getAuthentication().getName();
     log.info("username from security context holder " + username);
@@ -105,6 +112,7 @@ public class EmailScheduleServiceImpl implements EmailScheduleService {
     jobDataMap.put("subject", request.getSubject());
     jobDataMap.put("text", request.getText());
     jobDataMap.put("scheduleId", request.getScheduleId());
+    jobDataMap.put("openTalkDTO", openTalkDTO);
     return JobBuilder.newJob().ofType(EmailScheduleJob.class)
             .storeDurably()
             .withIdentity(Constant.jobGroup)

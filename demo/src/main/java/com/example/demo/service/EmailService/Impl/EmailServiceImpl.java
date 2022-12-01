@@ -8,11 +8,13 @@ import com.example.demo.service.EmailService.EmailService;
 import com.example.demo.service.Impl.EmployeeService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.mail.javamail.MimeMessagePreparator;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
 import javax.annotation.PostConstruct;
@@ -30,6 +32,8 @@ public class EmailServiceImpl implements EmailService {
   private final JavaMailSender mailSender;
   private final EmployeeService employeeService;
 
+  private final TemplateEngine templateEngine;
+
   @PostConstruct
   private void postConstruct() {
     log.info("preparing for inviting open talk");
@@ -42,7 +46,7 @@ public class EmailServiceImpl implements EmailService {
 
   @Async
   @Override
-  public void sendMail(Email email/*, Long branchId, OpenTalkDTO openTalkDTO*/) {
+  public void sendMail(Email email, OpenTalkDTO openTalkDTO) {
     List<String> emails = employeeService.findAllEmployees()
             .stream().map(EmployeeDTO::getEmail)
             .collect(Collectors.toList());
@@ -50,10 +54,15 @@ public class EmailServiceImpl implements EmailService {
     MimeMessagePreparator predator = mimeMessage -> {
       MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED,
               StandardCharsets.UTF_8.name());
+
       helper.setSubject(email.getSubject());
-      helper.setText(email.getText());
+      helper.addAttachment("logo.png", new ClassPathResource("logo.png"));
+//      helper.setText(email.getText());
 //            helper.addBcc("dungv0612@gmail.com");
       helper.setFrom("dungvh0612@gmail.com");
+
+
+      helper.setText(convertHtmlThymeleaf(openTalkDTO));
       int turn = 0;
       for (String s : emails) {
         helper.addBcc(s);
@@ -61,14 +70,14 @@ public class EmailServiceImpl implements EmailService {
         if (turn == 10) break;
       }
     };
+
     mailSender.send(predator);
     log.info("Job completed" + new Date());
-
   }
 
 
-  public void sendEmailInviteOpenTalkFromTemplate(OpenTalkDTO openTalkDTO) {
-    Long id = openTalkDTO.getEmployeeDTO().getId();
+  public String convertHtmlThymeleaf(OpenTalkDTO openTalkDTO) {
+//    Long id = openTalkDTO.getEmployeeDTO().getId();
     List<EmployeeDTO> employeeDTOs = employeeService.findAllEmployees();
 //        List<String> fullNames = employeeService.findAllFullNameExceptHost(id);
     Locale locale = Locale.forLanguageTag(Constant.LANGUAGE_TAG);
@@ -76,6 +85,6 @@ public class EmailServiceImpl implements EmailService {
     context.setVariable(Constant.RECIPIENT, employeeDTOs);
     context.setVariable(Constant.TOPIC, openTalkDTO);
 
-
+    return templateEngine.process("email/invite-email.html", context);
   }
 }

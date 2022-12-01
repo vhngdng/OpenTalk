@@ -29,15 +29,4 @@ public class MailSchedule {
     @Column(name = "is_deleted")
     private boolean isDeleted;
 
-//    public Response toResponse() {
-//        Response response = new Response();
-//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
-//        response.setScheduleId(this.scheduleId);
-//        response.setUsername(this.username);
-//        response.setToEmail(this.toEmail);
-//        response.setScheduledTime(LocalDateTime.parse(this.scheduleDateTime, formatter));
-//        response.setZoneId(ZoneId.of(this.scheduleZoneId));
-//        return response;
-//
-//    }
 }

@@ -2,6 +2,7 @@ package com.example.demo.entity;
 
 
 import com.example.demo.Audit.Audit;
+import com.example.demo.entity.projection.OpenTalkInvitingEmail;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -14,7 +15,10 @@ import java.time.LocalDateTime;
 @Data
 @Table(name = "openTalk")
 @EntityListeners(AuditingEntityListener.class)
-public class OpenTalk {
+
+
+
+public class OpenTalk implements OpenTalkInvitingEmail {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -47,7 +51,6 @@ public class OpenTalk {
                     {@JoinColumn(name = "opentalk_id", referencedColumnName = "id")},
             inverseJoinColumns =
                     {@JoinColumn(name = "employee_id", referencedColumnName = "id")})
-//    @JsonIgnoreProperties("openTalks")
     private Employee employee;
     @ManyToOne(fetch = FetchType.EAGER,
             cascade = {CascadeType.DETACH, CascadeType.MERGE,

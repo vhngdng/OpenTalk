@@ -2,16 +2,16 @@ package com.example.demo.mapper;
 
 import com.example.demo.Audit.Audit;
 import com.example.demo.Audit.AuditDTO.AuditDTO;
+import com.example.demo.Scheduler.EmailEntity.MailSchedule;
+import com.example.demo.Scheduler.ScheduleDto.Request;
+import com.example.demo.Scheduler.ScheduleDto.Response;
 import com.example.demo.dto.BranchDTO;
 import com.example.demo.dto.Display.AccountDisplayDTO;
 import com.example.demo.dto.Display.OpenTalkDisplayDTO;
-import com.example.demo.Scheduler.ScheduleDto.Request;
-import com.example.demo.Scheduler.ScheduleDto.Response;
 import com.example.demo.dto.EmployeeDTO;
 import com.example.demo.dto.OpenTalkDTO;
 import com.example.demo.dto.RoleDTO;
 import com.example.demo.entity.Branch;
-import com.example.demo.Scheduler.EmailEntity.MailSchedule;
 import com.example.demo.entity.Employee;
 import com.example.demo.entity.OpenTalk;
 import com.example.demo.entity.UserRole.Role;
@@ -135,4 +135,8 @@ public interface MapStructMapper {
     }
 
     List<Response> getResponseFromMailSchedule (List<MailSchedule> mailSchedule);
+
+//    default OpenTalk fromEmailOpenTalkToOpenTalk(OpenTalkInvitingEmail openTalkInvitingEmail) {
+//
+//    }
 }

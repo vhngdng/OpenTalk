@@ -140,6 +140,7 @@ public class OpenTalkService implements IOpenTalkService {
     }
 
 
+
 //    public void initEmployee() {
 //        Random rd = new Random();
 //        for (int i = 0; i < 50; i++) {

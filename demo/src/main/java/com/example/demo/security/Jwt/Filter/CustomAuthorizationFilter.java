@@ -35,17 +35,6 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-//        String jwt = parseJwt(request);
-//        logger.info("jwt from request " + jwt);
-//        if (jwt != null && jwtUtil.validateJwtToken(jwt)) {
-//            String username = jwtUtil.getUserNameFromJwtToken(jwt);
-//
-//            UserDetails userDetails = userDetailService.loadUserByUsername(username);
-//            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-//            authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-//            SecurityContextHolder.getContext().setAuthentication(authentication);
-//        }
-//        logger.info("token:" + jwt);
         final String header = request.getHeader(HttpHeaders.AUTHORIZATION);
         String token = null;
         String username = null;
@@ -57,7 +46,6 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
             username = jwtUtil.getUserNameFromJwtToken(token);
             logger.info("username: " + username);
         }
-
         // if authentication == null
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetailImpl userDetail = userDetailService.loadUserByUsername(username);
@@ -68,23 +56,9 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         }
+
         filterChain.doFilter(request, response);
-
-//        }catch(Exception ex){
-//            log.error("Error logging in: {}", ex.getMessage());
-//            response.setHeader("error", ex.getMessage());
-//            response.sendError(HttpStatus.FORBIDDEN.value());
-//            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-//            new ObjectMapper().writeValue(response.getOutputStream(), token);
     }
-
-
-//        Optional<String> token = Optional.ofNullable(request.getHeader("Authorization"))
-//                .filter(s -> s.length() > "BEARER".length() && s.startsWith("BEARER"))
-//                .map(s -> s.substring(7));
-//        Optional<Authentication> authentication = jwtUtil.validateJwtToken(token);
-
-
 }
 
 

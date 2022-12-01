@@ -83,9 +83,6 @@ public class JwtTokenUtil {
     public boolean validateJwtToken(String authToken) {
         try {
             return !Jwts.parser().setSigningKey(secret).parseClaimsJws(authToken).getBody().getSubject().isBlank();
-//            final String username = getUserNameFromJwtToken(authToken);
-//            if (username.equals())
-//            return true;
         }catch (AccessDeniedException e){
             throw new AccessDeniedException("Access denied");
         } catch (SignatureException e) {

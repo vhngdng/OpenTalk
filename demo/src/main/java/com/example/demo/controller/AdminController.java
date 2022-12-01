@@ -11,6 +11,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -60,6 +63,8 @@ public class AdminController {
     }
 
     @PutMapping("/employee/{id}")
+    @Transactional(propagation = Propagation.MANDATORY,
+     isolation = Isolation.READ_COMMITTED)
     public ResponseEntity<EmployeeDTO> updateEmployee(@NotNull @RequestBody EmployeeDTO model,
                                                       @PathVariable Long id) {
         return ResponseEntity
